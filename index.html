@@ -1932,14 +1932,14 @@ function trTick(dt){GT+=dt;const want=Math.round((PL.x>CW*TS?6:14)*(typeof trafK
   if(!block&&near(PL.x,PL.y-4,4)&&PL.alt<.5)block=true;
   if(!block)for(const p of PEDS)if(p.onRoad&&near(p.wx,p.wy,3)){block=true;break}
   if(c.v<2&&!rd)c.stk=(c.stk||0)+dt;else if(!rd)c.stk=0;if(c.stk>5)c.stk=0;
-  if(block){c.v=Math.max(0,c.v-TS*20*dt);if(c.v<1&&near(PL.x,PL.y-4,4)&&R()<dt*.3)sfx('horn')}else c.v=Math.min(c.vm,c.v+TS*6*dt);
+  if(block){c.v=Math.max(0,c.v-TS*20*dt);if(c.v<1&&near(PL.x,PL.y-4,4)&&R()<dt*.3)sfx('horn')}else c.v=Math.min(c.vm,c.v+TS*6*dt);trPlan(c);if(c.pl&&c.pl.nd!=null){const dd=(c.d===0||c.d===2)?(c.pl.c-c.x)*DX[c.d]:(c.pl.c-c.y)*DY[c.d];if(dd>0&&dd<56)c.v=Math.min(c.v,c.vm*.4)}
   const sp=c.v*dt;let nx=c.x+DX[c.d]*sp,ny=c.y+DY[c.d]*sp;
   if(c.d===0||c.d===2){const k=Math.round((c.y/TS-(c.d===0?3:1))/PY);
    for(let m=0;m<=NX;m++){const a=lane(1,m),b=lane(3,m);let turned=false;for(const xs of(c.d===0?[a,b]:[b,a])){if(!((c.x<xs&&nx>=xs)||(c.x>xs&&nx<=xs)))continue;const key=xs+','+c.y;if(c.lt===key)continue;c.lt=key;
-     const nd=xs===a?1:3;const forced=!canGo(c.d,m,k);if(!canGo(nd,k))continue;if(forced||R()<.26){nx=xs;ny=c.y;c.d=nd;c.v*=.6;turned=true;break}}if(turned)break}}
+     const nd=xs===a?1:3;const forced=!canGo(c.d,m,k);if(!canGo(nd,k))continue;if(forced||trWants(c,xs,nd)){nx=xs;ny=c.y;c.d=nd;c.v*=.85;c.pl=null;c.blT=.7;turned=true;break}}if(turned)break}}
   else{const m=Math.round((c.x/TS-(c.d===1?1:3))/PX);
    for(let k=0;k<=NY;k++){const a=lane(2,k),b=lane(0,k);let turned=false;for(const ys of(c.d===1?[a,b]:[b,a])){if(!((c.y<ys&&ny>=ys)||(c.y>ys&&ny<=ys)))continue;const key=c.x+','+ys;if(c.lt===key)continue;c.lt=key;
-     const nd=ys===a?2:0;const forced=!canGo(c.d,k);if(!canGo(nd,m,k))continue;if(forced||R()<.26){ny=ys;nx=c.x;c.d=nd;c.v*=.6;turned=true;break}}if(turned)break}}
+     const nd=ys===a?2:0;const forced=!canGo(c.d,k);if(!canGo(nd,m,k))continue;if(forced||trWants(c,ys,nd)){ny=ys;nx=c.x;c.d=nd;c.v*=.85;c.pl=null;c.blT=.7;turned=true;break}}if(turned)break}}
   c.x=nx;c.y=ny;if(c.x<0||c.y<0||c.x>MW*TS||c.y>CH*TS)TR.splice(i,1)}}
 // ---------- Passanten ----------
 function routePos(g,s){s=((s%g.P)+g.P)%g.P;if(g.line){if(s<g.w)return[g.l+s,g.t,0];return[g.r-(s-g.w),g.t,2]}
@@ -2057,7 +2057,7 @@ function render(){const W=cv.width,H=cv.height;ctx.setTransform(1,0,0,1,0,0);ctx
  for(const e of E){const o=e[2];switch(e[1]){
   case 0:drawPerson(ctx,o.wx,o.wy,o.dir,o===TALK?0:Math.floor(o.an),o.lk);if(o===TALK){fr(ctx,'#fff',o.wx-3,o.wy-26,7,6);fr(ctx,'#000',o.wx-2,o.wy-24,1,1);fr(ctx,'#000',o.wx,o.wy-24,1,1);fr(ctx,'#000',o.wx+2,o.wy-24,1,1)}break;
   case 1:if(o.sit&&o.seat)drawPersonSit(ctx,o.seat[0],o.seat[1],o.dir,o.lk);else drawPerson(ctx,o.x,o.y,o.dir,o.path&&o.path.length?Math.floor(o.an):0,o.lk);break;
-  case 2:drawVeh(ctx,o.x,o.y,[0,Math.PI/2,Math.PI,-Math.PI/2][o.d],o.veh);break;
+  case 2:drawVeh(ctx,o.x,o.y,o.va!=null?o.va:[0,Math.PI/2,Math.PI,-Math.PI/2][o.d],o.veh);break;
   case 3:{const v=vehOf(o.m);drawVeh(ctx,o.x,o.y,o.a,{...v,c:o.c||v.c});if(PL.car===e[3]&&(v.sh==='bike'||v.sh==='scooter'||v.sh==='jetski'||v.sh==='dinghy'))drawPerson(ctx,o.x,o.y+3,PL.dir,0,myLook());break}
   case 4:if(PL.sit)drawPersonSit(ctx,PL.x,PL.y,PL.dir,myLook());else drawPerson(ctx,PL.x,PL.y,PL.dir,PL.mv?Math.floor(PL.an):0,myLook());if(PL.bub&&PL.bub.t>0){drawTxt(ctx,PL.bub.s,PL.x,PL.y-26,'#fff','#000')}break;
   case 5:drawPerson(ctx,o.x,o.y,o.dir,0,o.lk);break;
@@ -3552,6 +3552,59 @@ const _vehImgV=vehImg;vehImg=function(v){const hd=v.plane||!(v.boat||v.air||v.sh
 #pscr .card .t{font-size:15px}#pscr .card .s{font-size:13px}#pscr .kv{font-size:14px}#pscr .hint{font-size:13.5px}#pscr .btn{font-size:14px}`;document.head.appendChild(st)})();
 const _afterRenderV=afterRender;afterRender=function(){_afterRenderV.apply(this,arguments);for(const im of document.querySelectorAll('.vimg img:not(.hdc)')){im.classList.add('hdc');const f=()=>{if(im.naturalWidth>=60)im.classList.add('hdimg')};if(im.complete)f();else im.onload=f}};
 (function(){const st=document.createElement('style');st.textContent=`.vimg img.hdimg{transform:none;image-rendering:auto;max-width:80px;max-height:38px}#bfx img{image-rendering:auto}`;document.head.appendChild(st)})();
+
+// ===================== Verkehr mit Blinkern & weichen Kurven · Nie mehr feststecken · Industrie & Lieferketten =====================
+// ---------- Verkehr: Abbiegen vorher planen, blinken, abbremsen ----------
+function trPlan(c){const h=c.d===0||c.d===2;const pos=h?c.x:c.y,dir=h?DX[c.d]:DY[c.d];
+ if(c.pl){if((c.pl.c2-pos)*dir<-3)c.pl=null;else return}
+ const decide=(first,second,ndR,ndL,okR,okL,forced)=>{let nd=null,cc=first;const r=R();
+  if(forced){if(okR)nd=ndR;else if(okL){nd=ndL;cc=second}}else if(r<.17&&okR)nd=ndR;else if(r<.32&&okL){nd=ndL;cc=second}
+  c.pl={c:cc,c2:second,nd};c.bl=nd==null?null:nd===ndR?'R':'L'};
+ if(h){const k=Math.round((c.y/TS-(c.d===0?3:1))/PY);for(let m=0;m<=NX;m++){const a=lane(1,m),b=lane(3,m);const f=c.d===0?a:b,s=c.d===0?b:a;const dd=(f-pos)*dir;if(dd>2&&dd<80){const nR=c.d===0?1:3,nL=c.d===0?3:1;decide(f,s,nR,nL,canGo(nR,k),canGo(nL,k),!canGo(c.d,m,k));return}}}
+ else{const m=Math.round((c.x/TS-(c.d===1?1:3))/PX);for(let k=0;k<=NY;k++){const a=lane(2,k),b=lane(0,k);const f=c.d===1?a:b,s=c.d===1?b:a;const dd=(f-pos)*dir;if(dd>2&&dd<80){const nR=c.d===1?2:0,nL=c.d===1?0:2;decide(f,s,nR,nL,canGo(nR,m,k),canGo(nL,m,k),!canGo(c.d,k));return}}}}
+function trWants(c,coord,nd){return!!(c.pl&&c.pl.nd===nd&&Math.abs(c.pl.c-coord)<1.5)}
+const _trTickI=trTick;trTick=function(dt){_trTickI(dt);for(const c of TR){const tg=[0,Math.PI/2,Math.PI,-Math.PI/2][c.d];if(c.va==null)c.va=tg;else c.va+=angD(tg,c.va)*Math.min(1,dt*6.5);
+  if(c.blT>0){c.blT-=dt;if(c.blT<=0)c.bl=null}else if(!c.pl)c.bl=null}};
+const _v4TopI=v4Top;v4Top=function(x,vis,t){_v4TopI(x,vis,t);const on=Math.floor(t*2.8)%2===0;if(!on)return;const dk=darkness();
+ for(const c of TR){if(!c.bl||!vis(c.x,c.y,30))continue;const a=c.va!=null?c.va:[0,Math.PI/2,Math.PI,-Math.PI/2][c.d];const fx=Math.cos(a),fy=Math.sin(a),rx=-fy,ry=fx,s=c.bl==='R'?1:-1;const hl=(CSH[c.veh.sh]||[28])[0]/2-1;
+  for(const k of[1,-1]){const X=c.x+fx*hl*k+rx*s*5,Y=c.y+fy*hl*k+ry*s*5;fr(x,'#ffae1a',X-1,Y-1,2,2);if(dk>.1){x.globalCompositeOperation='lighter';x.globalAlpha=.6;x.drawImage(glowC(255,170,40),X-7,Y-7,14,14);x.globalAlpha=1;x.globalCompositeOperation='source-over'}}}};
+// ---------- Nie feststecken ----------
+function freeSpot(x,y,maxR){if(boxFree(x,y,3,3))return[x,y];for(let r=2;r<(maxR||80);r+=2)for(let k=0;k<16;k++){const a=k/16*Math.PI*2;const nx=x+Math.cos(a)*r,ny=y+Math.sin(a)*r;if(boxFree(nx,ny,3,3)&&walkable(Math.floor(nx/TS),Math.floor((ny-1)/TS)))return[nx,ny]}return null}
+let stuckT=0;
+function unstuckTick(dt){if(PL.car!=null||PL.sit||MENU)return;if(boxFree(PL.x,PL.y,3,3)){stuckT=0;return}stuckT+=dt;if(stuckT<.25)return;stuckT=0;const p=freeSpot(PL.x,PL.y,140);if(p){PL.x=p[0];PL.y=p[1]}else{const l=PL.inLot;if(l&&l.out){PL.x=(l.out.x+.5)*TS;PL.y=(l.out.y+.8)*TS;PL.inLot=null}}}
+// Möbel nie so stellen, dass der Weg zur Tür blockiert ist
+function occOf(l,arr){const o=new Set();for(const e of arr){const it=ITEMS[e[0]];if(!it||it.wall||it.flat||e[2]<0)continue;const w=e[3]?it.h:it.w,h=e[3]?it.w:it.h;for(let y=0;y<h;y++)for(let x=0;x<w;x++)o.add((e[1]+x)+','+(e[2]+y))}return o}
+function roomOK(l,arr){if(!l.inT)return true;const occ=occOf(l,arr);const sx=l.inT.x-l.ix,sy=l.inT.y-l.iy;if(occ.has(sx+','+sy))return false;const seen=new Set([sx+','+sy]);const q=[[sx,sy]];
+ while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx<0||ny<0||nx>=l.iw||ny>=l.ih||seen.has(k)||occ.has(k))continue;seen.add(k);q.push([nx,ny])}}
+ let free=0;for(let y=0;y<l.ih;y++)for(let x=0;x<l.iw;x++)if(!occ.has(x+','+y))free++;return seen.size>=free}
+furnSet=function(l,ids,arr){for(const id of ids){const it=ITEMS[id];if(!it)continue;let done=false;for(let y=0;y<l.ih&&!done;y++)for(let x=0;x<l.iw&&!done;x++){if(it.wall){if(!canPlace(l,id,x,-1)){arr.push([id,x,-1]);done=true}}else if(!canPlace(l,id,x,y,false)){arr.push([id,x,y]);if(roomOK(l,arr))done=true;else arr.pop()}}}};
+// Startpunkt immer auf freier Fläche
+const _spawnPI=spawnPoint;spawnPoint=function(){const p=_spawnPI();return freeSpot(p[0],p[1],160)||p};
+// ---------- Industrie & Lieferketten ----------
+const SUPPLY={bakeryfab:['bakery','cafe','breakfast','donut','sandwich','market','grocer','crepe','choco'],dairy:['icecream','cafe','smoothie','market','grocer','deli','organic','bubble'],brewery:['pub','bar','brauhaus','drinks','club','beachbar','bbq'],winery:['winebar','winestore','gourmet','italian','tapas','cocktail'],
+ fishfarm:['sushi','fishrest','market','grocer','ramen','asia'],farm:['vegan','organic','farmshop','market','grocer','burger','steak','fastfood','drivein','chicken','taco','mexican','greek','imbiss','doener','fries','pizza'],
+ textile:['fashion','boutique','shoes','bridal','tailor','second','sport','outdoor'],elecfab:['electro','phones','pcstore','hifi','gamestore'],joinery:['furnstore','diy','antique'],sawmill:['furnstore','diy'],pharmalab:['pharmacy','drugstore','clinic','doctor','dentist'],
+ printing:['books','comics','copy','adagency'],carfab:['autoparts','tires','garage','tireservice'],chemical:['drugstore','perfume','dryclean','laundry'],robotics:['electro','pcstore'],steel:['diy','autoparts'],logistics:['*']};
+function myFactories(){return ownedLots().filter(l=>{const o=own(l);return o.bt&&btOf(o.bt).cat==='ind'})}
+function suppliers(bt){const out=[];for(const f of myFactories()){const fb=own(f).bt;const s=SUPPLY[fb];if(s&&(s.includes(bt)||s[0]==='*'))out.push(f)}return out}
+function shopsOf(f){const s=SUPPLY[own(f).bt]||[];return ownedLots().filter(l=>{const o=own(l);return o.bt&&l!==f&&btOf(o.bt).cat!=='ind'&&(s.includes(o.bt)||s[0]==='*')})}
+const _bizCalcI=bizCalc;bizCalc=function(l){const r=_bizCalcI(l);const o=own(l);if(!o||!o.bt||!r||!r.rev)return r;const b=btOf(o.bt);
+ if(b.cat!=='ind'){const sp=suppliers(o.bt);if(sp.length){const own_=sp.some(f=>own(f).bt!=='logistics');const cut=(own_?.32:0)+(sp.some(f=>own(f).bt==='logistics')?.06:0);r.goodsCut=r.goods*cut;r.goods-=r.goodsCut;r.profit+=r.goodsCut;r.sup=sp.length}}
+ else{const n=shopsOf(l).length;if(n){const bonus=r.rev*Math.min(.6,n*.08);r.rev+=bonus;r.profit+=bonus;r.chain=n}}return r};
+APPS.splice(5,0,['ind','factory','#8a8a92',L('Industrie','Industry')]);
+function indView(){const fs=myFactories();let h=`<div class="hint">${tt('Fabriken stehen im Industriegebiet (Osten & Südosten der Stadt). Sie produzieren und verkaufen direkt – und beliefern deine eigenen Läden: Die zahlen dann ~32 % weniger für Ware, und die Fabrik verdient pro belieferter Filiale mehr.','Factories are in the industrial zone (east & southeast of the city). They produce and sell directly – and supply your own stores: those pay ~32% less for goods, and the factory earns more per supplied store.')}</div>`;
+ if(fs.length){h+=`<h3>${tt('Deine Fabriken','Your factories')}</h3>`;for(const f of fs){const o=own(f),b=btOf(o.bt),r=f._st||bizCalc(f),sh=shopsOf(f);
+  h+=`<div class="pn"><b>${IMG(b.g,b.c)} ${lotName(f)}</b><div class="kv" style="margin-top:4px"><span>${tt('Gewinn/Tag','Profit/day')}</span><span class="${r.profit>=0?'g':'r'}">${fm(r.profit||0)}</span><span>${tt('Beliefert','Supplies')}</span><span>${sh.length} ${tt('Filialen','stores')}</span></div><div class="s" style="color:var(--mu)">${tt('Liefert an: ','Delivers to: ')}${(SUPPLY[o.bt]||[]).slice(0,6).map(id=>id==='*'?tt('alle Läden','all stores'):T(btOf(id).n)).join(', ')}</div></div>`}}
+ else h+=`<div class="pn">${tt('Du hast noch keine Fabrik.','You don’t own a factory yet.')}</div>`;
+ const ls=LOTS.filter(l=>l.dist==='ind'&&(l.kind==='com'||l.kind==='empty')&&!S.lots[l.id]&&listingOf(l)).slice(0,8);
+ h+=`<h3>${tt('Industrieflächen zu haben','Industrial sites available')}</h3>`+(ls.length?ls.map(l=>{const li=listingOf(l);return`<div class="card"><img class="ic px" src="${icon('factory','#8a8a92')}"><div class="gr"><div class="t">${lotName(l)} · ${l.pw}×${l.ph}</div><div class="s">${li&&li.mode==='rent'?tt('Miete ','Rent ')+fm(lotRent(l))+tt('/Tag','/day'):tt('Kauf ','Buy ')+fm(lotValue(l))}</div></div><button class="btn blue" data-a="route" data-v="${l.id}">📍</button></div>`}).join(''):`<div class="s">${tt('Gerade nichts frei – schau später wieder rein.','Nothing free right now – check back later.')}</div>`);
+ h+=`<h3>${tt('Was liefert wohin?','Who supplies whom?')}</h3>`+Object.keys(SUPPLY).filter(k=>BT.find(b=>b.id===k)).map(k=>`<div class="kv" style="font-size:13px"><span>${T(btOf(k).n)}</span><span style="color:var(--mu)">${SUPPLY[k][0]==='*'?tt('alle −6 %','all −6%'):SUPPLY[k].length+' '+tt('Ladentypen','store types')}</span></div>`).join('');return h}
+const _rpI=renderPhone;renderPhone=function(){if(PHONE!=='ind')return _rpI();const s=$('pscr');const y=s.scrollTop;s.innerHTML=`<div class="phd"><button data-a="pback">‹</button><b>${tt('Industrie','Industry')}</b></div>`+indView();s.scrollTop=y;afterRender();phoneFit()};
+// Lieferwagen deiner Firma im Verkehr
+const _spawnTrI=spawnTraffic;spawnTraffic=function(){const n=TR.length;_spawnTrI();if(TR.length>n&&myFactories().length&&R()<.22){const c=TR[TR.length-1];const base=CARS.find(v=>v.sh==='van')||c.veh;c.veh={...base,id:'brandvan',c:S.brand?S.brand.c:'#e8e8e8',c2:'#1a1a1a'};c.vm=Math.min(c.vm,5*TS)}};
+// Fabrik-Atmosphäre: Rauch aus Schornsteinen im Industriegebiet
+const _v4UnderI=v4Under;v4Under=function(x,vis,t,a,b,c,d){_v4UnderI(x,vis,t,a,b,c,d)};
+let smkT=0;const _v4TickI=v4Tick;v4Tick=function(dt){_v4TickI(dt);if(!S.started||MENU)return;unstuckTick(dt);smkT-=dt;if(smkT<=0){smkT=.25;for(const l of LOTS){if(l.dist!=='ind'||!l.rects||!l.rects.length)continue;const id=(own(l)&&own(l).bt)||npcOf(l);if(!id||btOf(id).cat!=='ind')continue;const r=l.rects[0];const X=(r.x+r.w-2)*TS,Y=r.y*TS;if(Math.abs(X-PL.x)>VW||Math.abs(Y-PL.y)>VH)continue;puff(X+rf(-2,2),Y-6,rf(-3,6),-rf(10,18),R()<.5?'#9a9aa0':'#c8c8d0',4,2.2)}}};
 
 // ===================== Start, Hauptmenü & Hauptschleife =====================
 function spawnPoint(){const h=ownedLots().find(l=>own(l).home);if(h&&h.iw&&h.ih)return[(h.ix+Math.floor(h.iw/2)+.5)*TS,(h.iy+h.ih-1.2)*TS];const l=h||LOTS.find(x=>x.spec==='jobs');return[(l.out.x+.5)*TS,(l.out.y+.8)*TS]}
