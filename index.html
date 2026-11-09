@@ -3448,7 +3448,7 @@ const _v4TopLf=v4Top;v4Top=function(x,vis,t){_v4TopLf(x,vis,t);const{vx0,vy0}=LV
   for(let i=0;i<n;i++){const h=hsh(i,7),h2=hsh(i,13);const sp=380+h2*220;const X=vx0+((h*vw*1.3+t*sl*30)%(vw+20))-10,Y=vy0+((h2*vh+t*sp)%(vh+30))-20;x.moveTo(X,Y);x.lineTo(X-sl,Y+10)}x.stroke();
   x.fillStyle='rgba(220,235,255,.7)';for(let i=0;i<n/4;i++){const p=(t*2+hsh(i,3)*10)%1;if(p>.25)continue;const X=vx0+hsh(i,Math.floor(t*2+hsh(i,3)*10))*vw,Y=vy0+hsh(i+99,Math.floor(t*2+hsh(i,3)*10))*vh;x.fillRect(X-1,Y,1,1);x.fillRect(X+1,Y,1,1);x.fillRect(X,Y-1,1,1)}}
  if(W.k==='fog'){x.globalAlpha=.22*W.i;x.fillStyle='#e8ecf0';x.fillRect(vx0-2,vy0-2,vw+4,vh+4);for(let i=0;i<7;i++){const cx=vx0+((t*8+i*211)%(vw+300))-150,cy=vy0+((i*131)%vh);x.globalAlpha=.55*W.i;x.drawImage(glowC(235,238,242),cx-170,cy-110,340,220)}x.globalAlpha=1}
- if(W.fl>0){x.globalAlpha=W.fl*(W.fl>.7?.8:.45);x.fillStyle='#eef4ff';x.fillRect(vx0-2,vy0-2,vw+4,vh+4);x.globalAlpha=1}};
+ if(W.fl>0){x.globalAlpha=W.fl*(W.fl>.7?.32:.16);x.fillStyle='#eef4ff';x.fillRect(vx0-2,vy0-2,vw+4,vh+4);x.globalAlpha=1}};
 // ---------- HUD & Tick ----------
 const _v4hudLf=v4hud;v4hud=function(){_v4hudLf();const el=$('v4top');if(!el)return;let w=el.querySelector('.wth');if(!w){w=document.createElement('span');w.className='wth';el.appendChild(w)}w.innerHTML=`${WK[W.k].i} ${temp()}°F${rush()?' · 🚗 '+tt('Rush Hour','Rush hour'):''}`};
 let lifeS=0;const _v4TickLf=v4Tick;v4Tick=function(dt){_v4TickLf(dt);if(!S.started||MENU)return;weatherTick(dt);if(!PAUSE)evTick(dt);lifeS+=dt;if(lifeS>1){lifeS=0;PEDMAX=Math.round(44*pedK());if(PEDS.length>PEDMAX+3){const i=PEDS.findIndex(p=>Math.hypot(p.wx-PL.x,p.wy-PL.y)>VW*.7);if(i>=0)PEDS.splice(i,1)}}};
@@ -4189,8 +4189,8 @@ tunePrev=function(c){const v={...vehOf(c.m),c:c.c,tu:c.tu};const b=carPix(v);con
 // ---------- Wände wie bei Sims (verbunden, mit Höhe) ----------
 const WALLID={iwall:1,iwallb:1,iglass:1};
 const _drawItem5d=drawItem;drawItem=function(x,id,px,py,w,h,rot,seed){if(WALLID[id]){if(seed===3)wallPrev(x,id,px,py);return}return _drawItem5d(x,id,px,py,w,h,rot,seed)};
-const WSTY={iwall:{f:'#d8cfbe',fl:'#e6dfd0',t:'#f6f1e6',e:'#8a8070'},iwallb:{f:'#a4563a',fl:'#b8664a',t:'#d08a6a',e:'#5a2a1a',brick:1},iglass:{f:'rgba(150,205,235,.55)',fl:'rgba(190,230,250,.6)',t:'#dff4ff',e:'#5a7a8a',glass:1}};
-const WH=14,WT=4;
+const WSTY={iwall:{f:'#e4dccb',fl:'#f0eadc',t:'#a89e8a',e:'#8a8070'},iwallb:{f:'#a4563a',fl:'#b8664a',t:'#d08a6a',e:'#5a2a1a',brick:1},iglass:{f:'rgba(150,205,235,.55)',fl:'rgba(190,230,250,.6)',t:'#dff4ff',e:'#5a7a8a',glass:1}};
+const WH=14,WT=6;
 function wallPrev(x,id,px,py){drawWallTile(x,id,px,py+WH-2,{l:1,r:1})}
 function drawWallTile(x,id,X,Y,nb){const s=WSTY[id];const cx=X+8,cy=Y+8,h2=WT/2;const rs=[[cx-h2,cy-h2,WT,WT]];
  if(nb.l)rs.push([X,cy-h2,cx-h2-X,WT]);if(nb.r)rs.push([cx+h2,cy-h2,X+16-cx-h2,WT]);if(nb.u)rs.push([cx-h2,Y,WT,cy-h2-Y]);if(nb.d)rs.push([cx-h2,cy+h2,WT,Y+16-cy-h2]);
@@ -4206,7 +4206,7 @@ function drawWallTile(x,id,X,Y,nb){const s=WSTY[id];const cx=X+8,cy=Y+8,h2=WT/2;
  for(const r of rs){x.fillStyle=s.t;x.fillRect(r[0],r[1]-WH,r[2],r[3])}}
 let WMAP=new Map();
 function rebuildWMAP(){WMAP=new Map();for(const l of ownedLots()){const o=own(l);if(!o||!o.items)continue;for(const e of o.items)if(WALLID[e[0]])WMAP.set((l.ix+e[1])+','+(l.iy+e[2]),e[0])}}
-const _ents5d=v4Ents;v4Ents=function(E,vis,t){_ents5d(E,vis,t);rebuildWMAP();rebuildOMAP();for(const[k,id]of WMAP){const[tx,ty]=k.split(',').map(Number);const X=tx*TS,Y=ty*TS;if(!vis(X+8,Y+8,40))continue;const nb={l:WMAP.has((tx-1)+','+ty),r:WMAP.has((tx+1)+','+ty),u:WMAP.has(tx+','+(ty-1)),d:WMAP.has(tx+','+(ty+1))};E.push([Y+12,11,{draw:x=>drawWallTile(x,id,X,Y,nb)}])}};
+const _ents5d=v4Ents;v4Ents=function(E,vis,t){_ents5d(E,vis,t);rebuildWMAP();rebuildOMAP();for(const[k,id]of WMAP){const[tx,ty]=k.split(',').map(Number);const X=tx*TS,Y=ty*TS;if(!vis(X+8,Y+8,40))continue;const ow=(a,b)=>WMAP.has(a+','+b)||[G.WALL,G.BACKW].includes(tAt(a,b));const nb={l:ow(tx-1,ty),r:ow(tx+1,ty),u:ow(tx,ty-1)&&(WMAP.has(tx+','+(ty-1))||tAt(tx,ty-1)===G.BACKW),d:WMAP.has(tx+','+(ty+1))};E.push([Y+12,11,{draw:x=>drawWallTile(x,id,X,Y,nb)}])}};
 // ---------- Garten: schönere Pixel-Objekte, Hecken & Zäune verbinden sich ----------
 let OMAP=new Map();function rebuildOMAP(){OMAP=new Map();for(const l of ownedLots())for(const e of outItems(l))OMAP.set(e[1]+','+e[2],e[0])}
 function pcirc(x,cx,cy,r,col){x.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+r*.8));x.fillRect(cx-w,cy+y,w*2+1,1)}}
@@ -4290,6 +4290,155 @@ const _drawOut5e=drawOut;drawOut=function(x,id,X,Y){const t=GT,tx=Math.round(X/T
  if(id==='o_hedge'){_drawOut5e(x,id,X,Y);for(let i=1;i<15;i+=3){const o=Math.round(Math.sin(t*1.8+i+sd)*.6);x.fillStyle='#6ab858';x.fillRect(X+i+o,Y-5,1,1)}return}
  return _drawOut5e(x,id,X,Y)};
 // Bäume & Büsche, die die Stadt schon hat, wiegen sich auch leicht (Blätter-Glitzer)
+
+// ===================== V5.1: Aufräumen – keine Flugzeuge/Schirme, neues Handy, neue Karte, Bau-Menü, Räume in Häusern, weniger Mitteilungen =====================
+// ---------- Flugzeuge raus ----------
+const _ambT5f=ambientTick;ambientTick=function(dt){AIRP=null;AIRT=1e9;APL.st='off';_ambT5f(dt)};
+const _specAct5f=specAct;specAct=function(a,l){if(a==='airport'){toast(tt('Der Flugbetrieb ist eingestellt.','The airfield is closed.'),'info');return}return _specAct5f(a,l)};
+// ---------- Keine Regenschirme, sanftere Blitze ----------
+umb=function(){};
+// ---------- Mitteilungen: nur noch das Wichtige ----------
+let LASTIN=0,TSEEN=new Map();addEventListener('pointerdown',()=>{LASTIN=performance.now()},true);addEventListener('keydown',()=>{LASTIN=performance.now()},true);
+const NOISE=/Wetter|Weather|in der Nähe|nearby|Achievement|Erfolg|Level \d|Pixelgram|Tagesbonus|Daily bonus|Follower|mietfrei|rent-free|Ziel erreicht|Goal|Bau-Modus|Build mode|Paparazzi|Status|Bonus/i;
+toastFn=function(m,k){const now=performance.now();const user=now-LASTIN<1600;if(!user&&k!=='bad'&&(NOISE.test(m)||k==='info'))return;if(!user&&NOISE.test(m))return;
+ const key=m.slice(0,40);if(TSEEN.has(key)&&now-TSEEN.get(key)<15000)return;TSEEN.set(key,now);
+ const box=$('toasts');const t=document.createElement('div');t.className='toast '+(k||'');t.textContent=m;box.appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),250)},2300);while(box.children.length>2)box.firstChild.remove()};
+// ---------- Bildschirm füllt immer alles aus ----------
+let VPW=0,VPH=0;setInterval(()=>{const w=innerWidth,h=Math.max(innerHeight,(window.visualViewport&&visualViewport.height)||0);if(cv&&(w!==VPW||h!==VPH)){VPW=w;VPH=h;try{resize();if(BUILD)buildUI()}catch(e){}}},700);
+// ---------- Räume in Häusern: Schlafzimmer, Bad, Küche, Wohnzimmer ----------
+const W_='iwall';
+function roomTpl(iw,ih,v){const bed2=['hbed2','hbed2_blue','hbed2_grey'].filter(i=>ITEMS[i]);const sofa=['sofa','sofa_blue','sofa_grey','sofa_green'].filter(i=>ITEMS[i]);const B=bed2[v%bed2.length]||'hbed2',SO=sofa[v%sofa.length]||'sofa';
+ if(iw===5&&ih===5)return[[W_,2,0],[W_,2,1],[W_,0,2],[W_,2,2],[W_,4,2],['hbed1',0,0],['nstand',1,0],['vanity',3,0],['toilet',4,0],['shower',4,1],['kfridge',0,3],['kstove',0,4],[SO,3,4],['armchair',4,3],['wpaint',0,-1],['wmirror',4,-1]];
+ if(iw===6&&ih===6)return[[W_,3,0],[W_,3,1],[W_,3,2],[W_,5,2],[W_,0,3],[W_,1,3],[W_,3,3],[B,0,0],['nstand',2,0],['wardrobe',0,2],['vanity',4,0],['toilet',5,0],['shower',5,1],['kfridge',0,4],['kstove',0,5],['ksink',1,5],[SO,4,4],['armchair',3,5],['plant',5,3],['wpaint',1,-1],['wmirror',4,-1]];
+ if(iw===8&&ih===7)return[[W_,4,0],[W_,4,1],[W_,4,2],[W_,0,3],[W_,1,3],[W_,2,3],[W_,4,3],[W_,5,3],[W_,7,3],['hking',0,0],['nstand',3,0],['wardrobe',0,2],['tub',5,0],['toilet',7,0],['shower',7,1],['vanity',5,2],['kfridge',0,4],['kstove',1,4],['ksink',2,4],['dine4',0,5],['couch3',5,6],['ctable',5,5],['armchair',7,4],['wpaint',1,-1],['wclock',6,-1]];
+ if(iw===10&&ih===8)return[[W_,4,0],[W_,4,1],[W_,4,2],[W_,7,0],[W_,7,1],[W_,7,2],[W_,0,3],[W_,1,3],[W_,2,3],[W_,4,3],[W_,6,3],[W_,7,3],[W_,9,3],['hking',0,0],['nstand',3,0],['wardrobe',0,2],['tub',5,0],['shower',5,1],['toilet',6,2],['hbed1',9,0],['nstand',8,0],['kcounter',0,4],['kfridge',0,5],['dine6',0,6],['lsofa',6,6],['tvboard',6,4],['bigplant',9,4],['wpaint',1,-1],['wtv',5,-1],['wclock',8,-1]];
+ return null}
+function roomLayout(l,v){const t=roomTpl(l.iw,l.ih,v|0);if(!t)return null;const inx=l.inT.x-l.ix,iny=l.inT.y-l.iy;let gx=-9,gy=-9;if(l.gar){gx=l.x+l.w-2-l.ix;gy=l.gar.y+l.gar.h-2-l.iy}
+ const out=[];for(const e of t){const it=ITEMS[e[0]];if(!it)continue;if(it.wall){out.push(e.slice());continue}const w=it.w,h=it.h;let bad=false;for(let j=0;j<h;j++)for(let i=0;i<w;i++){const x=e[1]+i,y=e[2]+j;if(x<0||y<0||x>=l.iw||y>=l.ih||x===inx&&y===iny||x===gx&&y===gy||tAt(l.ix+x,l.iy+y)!==G.FLOOR)bad=true}if(!bad)out.push(e.slice())}
+ return out}
+const _furnRes5f=furnRes;furnRes=function(l){const r=roomLayout(l,l.id);if(!r)return _furnRes5f(l);l._fur=1;l.fix=r;l._w=1;l._res=[];const s=r.find(e=>/sofa|couch/.test(e[0]));if(s&&hsh(l.id,S.day)<.8)l._res.push([s[1],s[2]+1,0,3]);lotSolid(l)};
+const _starter5f=starterHome;starterHome=function(){_starter5f();const l=ownedLots().find(q=>own(q).starter);if(!l)return;const r=roomLayout(l,1);if(r){own(l).items=r;lotSolid(l)}};
+// Wände auch in fremden Häusern zeichnen
+rebuildWMAP=function(){WMAP=new Map();const add=(l,items)=>{for(const e of items)if(WALLID[e[0]])WMAP.set((l.ix+e[1])+','+(l.iy+e[2]),e[0])};for(const l of ownedLots()){const o=own(l);if(o&&o.items)add(l,o.items)}
+ const vx=cam.x,vy=cam.y;for(const l of LOTS){if(!l._w||S.lots[l.id])continue;if((l.px+l.pw)*TS<vx-40||l.px*TS>vx+VW+40||(l.py+l.ph)*TS<vy-40||l.py*TS>vy+VH+60)continue;add(l,l.fix||[])}};
+// ---------- Bau-Menü: ohne Emojis, kompakt, Auswahl abwählen zum Wischen ----------
+const _buildCats5f=buildCats;buildCats=function(l){return _buildCats5f(l).map(([k,n])=>[k,String(n).replace(/^[^\p{L}\p{N}]+/u,'').replace(/\s*[−-]25%/,'')])};
+const _buildUI5f=buildUI;buildUI=function(){_buildUI5f();if(!BUILD)return;const b=$('bInfo');if(b){const it=BUILD.sel&&ITEMS[BUILD.sel];if(!it&&!BUILD.sell)b.innerHTML=`<span class="bpz">⏸</span> ${tt('Pausiert · Wische über die Karte zum Verschieben · Teil antippen zum Auswählen','Paused · Swipe the map to move · Tap an item to select')}`;else if(it)b.innerHTML=b.innerHTML.replace(/ · <span style="color:#8ad0ff">.*$/,'')+` · <a data-a="bunsel" style="color:#8ad0ff;text-decoration:underline">${tt('abwählen','deselect')}</a>`}
+ const t=$('tray');if(t&&BUILD.cat==='shop5'&&!t.querySelector('.tdisc')){t.insertAdjacentHTML('afterbegin',`<div class="tdisc">−25%</div>`)}};
+L5A.bunsel=()=>{if(BUILD){BUILD.sel=null;BUILD.ghost=null;buildUI()}};
+// ---------- Handy: modern, dünner Rand, keine Kontodaten auf dem Homescreen ----------
+const _rp5f=renderPhone;renderPhone=function(){if(PHONE!=='home')return _rp5f();const pb=document.querySelector('.pbody');if(pb)pb.classList.remove('land');const s=$('pscr');s.classList.add('home5');
+ const hh=Math.floor(S.tod/DAYLEN*24),mm=Math.floor((S.tod/DAYLEN*24%1)*6)*10;const dock=['bank','map','job','pg'].map(id=>APPS.find(a=>a[0]===id)).filter(Boolean);const rest=APPS.filter(a=>!dock.includes(a));
+ const W={clear:'☀️',cloudy:'⛅',rain:'🌧️',storm:'⛈️',fog:'🌫️'}[W_k()]||'☀️';
+ s.innerHTML=`<div class="h5"><div class="h5w"><div class="h5t">${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}</div><div class="h5d">${tt('Tag','Day')} ${S.day} · ${W} ${typeof temp==='function'?temp()+'°F':''}</div></div>
+ <div class="h5g">${rest.map(a=>`<button data-a="app" data-v="${a[0]}"><img src="${appIcon(a)}"><span>${T(a[3])}</span></button>`).join('')}</div><div class="h5k">${dock.map(a=>`<button data-a="app" data-v="${a[0]}"><img src="${appIcon(a)}"></button>`).join('')}</div></div>`;afterRender()};
+function W_k(){try{return W.k}catch(e){return'clear'}}
+const _openPh5f=openPhone;openPhone=function(a){_openPh5f(a);const s=$('pscr');if(s)s.classList.toggle('home5',PHONE==='home')};
+// ---------- Neue Karte: dunkel & modern ----------
+const MPAL={0:[36,48,38],1:[66,70,80],2:[50,54,62],6:[26,54,86],7:[32,62,40],8:[58,60,56],9:[32,62,40],10:[42,56,44],11:[56,58,66],12:[42,62,44],13:[26,54,86],14:[116,104,78],17:[66,74,46],18:[72,62,50],19:[86,72,58],20:[60,64,72],21:[26,54,86],22:[42,56,44]};
+mapBase=function(){if(MAPBASE)return MAPBASE;const[c,x]=mkc(MW*MS,MH*MS);const im=x.createImageData(MW,MH);
+ for(let i=0;i<MW*MH;i++){const t=TL[i];let p=MPAL[t];const l=LOTM[i];if(!p||[3,4,5,15,16,23].includes(t)){const lo=l>=0?LOTS[l]:null;p=!lo?[70,70,78]:lo.kind==='res'?[84,76,96]:lo.kind==='spec'?[102,86,150]:lo.kind==='apt'?[86,80,98]:lo.dist==='ind'?[78,80,86]:[72,84,100]}
+  if((t===3||t===23)&&l>=0&&LOTS[l].demol)p=MPAL[0];im.data.set([p[0],p[1],p[2],255],i*4)}
+ const[c1,x1]=mkc(MW,MH);x1.putImageData(im,0,0);x.drawImage(c1,0,0,MW*MS,MH*MS);
+ // Gebäude-Kanten
+ x.strokeStyle='rgba(0,0,0,.45)';x.lineWidth=1;for(const l of LOTS)for(const r of(l.rects||[]))x.strokeRect(r.x*MS+.5,r.y*MS+.5,r.w*MS-1,r.h*MS-1);
+ // Straßen-Markierung
+ x.fillStyle='rgba(255,255,255,.12)';for(let k=0;k<=NY;k++)for(let X=0;X<(RURK.has(k)?MW:CW);X+=4)x.fillRect(X*MS,(k*PY+2)*MS-1,2*MS,1);for(let m=0;m<=NX;m++)for(let Y=0;Y<CH;Y+=4)x.fillRect((m*PX+2)*MS-1,Y*MS,1,2*MS);
+ // Bezirksnamen
+ x.font='bold 13px sans-serif';x.textAlign='center';const seen={};const lab=(n,X,Y)=>{x.fillStyle='rgba(0,0,0,.6)';x.fillText(n.toUpperCase(),X+1,Y+1);x.fillStyle='rgba(235,228,214,.85)';x.fillText(n.toUpperCase(),X,Y)};
+ for(let by=0;by<NY;by++)for(let bx=0;bx<NX;bx++){const d=DMAP[by][bx];if(seen[d]||d==='park')continue;seen[d]=1;lab(T(distOf(d).n),(ROAD+bx*PX+PX/2-1)*MS,(ROAD+by*PY+3)*MS)}
+ lab(tt('Land','Countryside'),(CW+45)*MS,12*MS);lab(tt('Inseln','Islands'),130*MS,(QUAY+22)*MS);
+ MAPBASE=c;return c};
+const SPECE={bank:'🏦',broker:'📈',estate:'🏠',jobs:'💼',lux:'💎',casino:'🎰',dealer:'🚗',fashion:'👗',hall:'🏛️',marina:'⛵',police:'🚓',fire:'🚒',hospital:'🏥',gunshop:'🔫',airport:'🛫',market:'🛒',hideout:'🏚️',tuner:'🔧',tuner2:'🔧'};
+const MIMG=new Map();function mImg(e,bg){const k=e+bg;let im=MIMG.get(k);if(!im){im=new Image();im.onload=()=>{const mc=document.getElementById('mapc');if(mc)drawMap(mc)};im.src=emojiIcon(e,bg);MIMG.set(k,im)}return im.complete&&im.naturalWidth?im:null}
+drawMap=function(mc){const x=mc.getContext('2d');x.imageSmoothingEnabled=false;const s=mc.width/MW;x.drawImage(mapBase(),0,0,mc.width,MH*s);
+ const pin=(cx,cy,col,r)=>{x.fillStyle='rgba(0,0,0,.5)';x.beginPath();x.arc(cx+1,cy+1,r+2,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(cx,cy,r+1.5,0,7);x.fill();x.fillStyle=col;x.beginPath();x.arc(cx,cy,r,0,7);x.fill()};
+ for(const li of S.listings){const l=LOTS[li.id];pin((l.px+l.pw/2)*s,(l.py+l.ph/2)*s,'#e8584a',2.5)}
+ for(const l of ownedLots()){x.strokeStyle='#ffd23a';x.lineWidth=2.5;x.strokeRect(l.px*s+1,l.py*s+1,l.pw*s-2,l.ph*s-2);x.fillStyle='rgba(255,210,58,.18)';x.fillRect(l.px*s+1,l.py*s+1,l.pw*s-2,l.ph*s-2)}
+ for(const l of LOTS)if(l.kind==='spec'&&l.spec!=='airport'){const cx=(l.px+l.pw/2)*s,cy=(l.py+l.ph/2)*s;x.fillStyle='rgba(0,0,0,.55)';x.beginPath();x.roundRect(cx-12,cy-11,26,26,7);x.fill();x.fillStyle='#1a1d24';x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=1.5;x.beginPath();x.roundRect(cx-13,cy-13,26,26,7);x.fill();x.stroke();const im=mImg(SPECE[l.spec]||'📍');if(im)x.drawImage(im,cx-10,cy-10,20,20)}
+ if(CHOP){const cx=(CHOP.px+CHOP.pw/2)*s,cy=(CHOP.py+CHOP.ph/2)*s;x.fillStyle='#1a0e0e';x.strokeStyle='#e8402a';x.lineWidth=2;x.beginPath();x.roundRect(cx-12,cy-12,24,24,6);x.fill();x.stroke();x.fillStyle='#ff5a3a';x.font='bold 15px sans-serif';x.textAlign='center';x.fillText('$',cx,cy+5)}
+ for(const d of DEAL5)pin(d.x/TS*s,d.y/TS*s,'#9a5aff',3);
+ for(const c of S.cars)if(c.g==null&&!c.tmp)pin(c.x/TS*s,c.y/TS*s,'#3a8ad8',2.5);
+ const tg=S.job?(S.job.st==='pick'?S.job.from:S.job.to):S.wp;if(tg){const X=(tg.x+.5)*s,Y=(tg.y+.5)*s;x.fillStyle=S.job?'#ffb21a':'#3a9aff';x.beginPath();x.arc(X,Y-12,8,0,7);x.fill();x.beginPath();x.moveTo(X-6,Y-8);x.lineTo(X+6,Y-8);x.lineTo(X,Y);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(X,Y-12,3.5,0,7);x.fill()}
+ const px=PL.x/TS*s,py=PL.y/TS*s;x.fillStyle='rgba(58,154,255,.22)';x.beginPath();x.arc(px,py,16,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(px,py,7.5,0,7);x.fill();x.fillStyle='#3a9aff';x.beginPath();x.arc(px,py,5.5,0,7);x.fill()};
+const _mapView5f=mapView;mapView=function(){let h=_mapView5f();h=h.replace(/<div class="legend">[\s\S]*?<\/div>/,`<div class="legend m5l"><span><i style="background:#ffd23a"></i>${tt('Deins','Yours')}</span><span><i style="background:#e8584a"></i>${tt('Zu haben','Available')}</span><span><i style="background:#3a9aff"></i>${tt('Du & Fahrzeuge','You & vehicles')}</span><span><i style="background:#9a5aff"></i>${tt('Schwarzmarkt','Black market')}</span><span><i style="background:#e8402a"></i>${tt('Hehler','Chop shop')}</span></div>`);
+ h=h.replace(/<button class="lux" data-a="route" data-v="(\d+)"[^>]*><img class="px"[^>]*src="[^"]*"><span class="t" style="margin:0">([^<]*)<\/span><\/button>/g,(m,id,n)=>{const l=LOTS[+id];if(l.spec==='airport')return'';return`<button class="m5p" data-a="route" data-v="${id}"><img src="${emojiIcon(SPECE[l.spec]||'📍')}"><span>${n}</span></button>`});return h};
+// ---------- Stile ----------
+(function(){const st=document.createElement('style');st.textContent=`
+html,body{height:100%;height:100dvh}#cv{width:100vw;height:100dvh}
+/* Mitteilungen */
+#toasts{top:calc(env(safe-area-inset-top,0px) + 50px)!important;bottom:auto!important;width:auto!important;max-width:min(60vw,420px)!important;align-items:center;gap:4px!important}
+.toast{font-size:12.5px!important;padding:4px 12px!important;border-radius:999px!important;border:1px solid rgba(255,255,255,.12)!important;background:rgba(16,14,12,.82)!important;box-shadow:0 4px 14px rgba(0,0,0,.35)!important;backdrop-filter:blur(6px);transition:opacity .25s,transform .25s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(60vw,420px)}
+.toast.out{opacity:0;transform:translateY(-6px)}.toast.bad{color:#ff8a7a}.toast.gold{color:#ffd23a}.toast.good{color:#8ae89a}
+/* Handy */
+#phone{background:rgba(0,0,0,.35)!important;justify-content:flex-end!important;padding:0 calc(env(safe-area-inset-right,0px) + 12px) 0 0!important}
+#phone .pbody{box-sizing:border-box!important;height:calc(100dvh - 16px)!important;max-height:760px!important;width:min(46vw,calc((100dvh - 16px) * .49),400px)!important;margin:auto 0!important;padding:0!important;border:5px solid #0b0b0d!important;border-radius:40px!important;box-shadow:0 0 0 1.5px #3a3a42,0 18px 50px rgba(0,0,0,.55)!important;background:#000!important;overflow:hidden;position:relative;aspect-ratio:auto!important;animation:ph5in .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes ph5in{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+#phone .pbody:before{top:7px!important;width:58px!important;height:18px!important;margin-left:-29px!important;border-radius:12px!important;background:#000!important;z-index:5}
+#phone .pbar{position:absolute;top:0;left:0;right:0;z-index:4;padding:9px 20px 0!important;font-size:11px!important;color:#fff!important;font-family:-apple-system,system-ui,sans-serif;font-weight:600;pointer-events:none;display:flex;justify-content:space-between}
+#phone #pscr{border:0!important;border-radius:0!important;margin:0!important;padding:38px 12px 26px!important;background:#101318!important;font-family:inherit}
+#phone .phome{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:118px!important;height:5px!important;border-radius:3px!important;background:rgba(255,255,255,.75)!important;border:0!important;margin:0!important;z-index:6}
+#phone #pscr.home5{padding:36px 14px 22px!important;background:radial-gradient(120% 80% at 20% 0%,#3a4fb8 0%,#2a2a6a 38%,#16122a 75%,#0e0c18 100%)!important;overflow:hidden;display:flex;flex-direction:column}
+.h5{display:flex;flex-direction:column;height:100%;font-family:-apple-system,system-ui,sans-serif}
+.h5w{text-align:center;color:#fff;margin:4px 0 14px;text-shadow:0 2px 8px rgba(0,0,0,.35)}.h5t{font-size:46px;font-weight:300;letter-spacing:-1px;line-height:1}.h5d{font-size:13px;opacity:.85;margin-top:4px}
+.h5g{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px;align-content:start;flex:1;min-height:0;overflow-y:auto}
+.h5g button,.h5k button{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:11px;font-family:-apple-system,system-ui,sans-serif;min-width:0}
+.h5g img,.h5k img{width:100%;max-width:54px;height:auto;aspect-ratio:1;border-radius:14px;image-rendering:pixelated;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.h5g span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.h5g button:active img,.h5k button:active img{transform:scale(.9);filter:brightness(.85)}
+.h5k button{flex:1;max-width:60px}.h5k{display:flex;justify-content:space-around;gap:8px;background:rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:28px;padding:10px 6px;margin-top:10px}
+/* Apps im Querformat */
+#phone:has(.pbody.land){justify-content:center!important;padding:0!important}
+#phone .pbody.land{width:min(96vw,calc((100dvh - 16px) * 2.1),1180px)!important;height:calc(100dvh - 16px)!important;max-height:620px!important;border-radius:34px!important}
+#phone .pbody.land #pscr{display:block!important;padding:36px 22px 24px!important}
+#phone .pbody.land #pscr>*{max-width:900px;margin-left:auto;margin-right:auto}
+#phone .pbody.land #pscr .card{margin:0 auto 6px!important}
+#phone .pbody.land .phd{position:sticky;top:-36px;z-index:3;background:#101318;padding:6px 0;margin-top:-6px}
+/* Karte */
+#mapc{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#1a1e24;image-rendering:auto}
+.m5l{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;margin:8px 2px}.m5l i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle;border:1.5px solid #fff}
+.m5p{display:flex;align-items:center;gap:8px;background:#1c2028;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:6px 10px;color:#e8e2d6;font:inherit;font-size:13px;text-align:left}.m5p img{width:26px;height:26px;image-rendering:pixelated}
+/* Bau-Menü kompakt */
+#bui .btop{top:calc(env(safe-area-inset-top,0px) + 6px)!important;left:10px!important;right:10px!important;padding:4px 6px!important;border-radius:12px!important;border:1px solid rgba(255,255,255,.1)!important;background:rgba(14,12,10,.88)!important;backdrop-filter:blur(6px)}
+#bui .btop .bt{font-size:13px!important}#bui .btop .btn{font-size:12.5px!important;padding:5px 10px!important;border-radius:8px}
+#bui #bInfo{bottom:calc(env(safe-area-inset-bottom,0px) + 112px)!important;left:50%!important;right:auto!important;transform:translateX(-50%);max-width:min(92vw,720px);font-size:12px!important;line-height:1.3!important;padding:4px 12px!important;border-radius:999px!important;border:1px solid rgba(255,255,255,.1)!important;background:rgba(14,12,10,.85)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bui #bcat{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)!important;gap:4px!important;padding:0 10px!important}
+#bui #bcat button{font-size:12.5px!important;padding:4px 11px!important;border-radius:999px;border:1px solid rgba(255,255,255,.1)!important;background:rgba(20,18,16,.92)!important;white-space:nowrap}#bui #bcat button.on{background:#ffd23a!important;color:#1a1408!important;box-shadow:none!important}
+#bui #tray{height:auto;padding:6px 10px calc(env(safe-area-inset-bottom,0px) + 6px)!important;gap:6px!important;background:rgba(12,10,8,.94)!important;border-top:1px solid rgba(255,255,255,.08)!important}
+#bui .ti{width:64px!important;height:70px!important;border-radius:10px;border:1px solid rgba(255,255,255,.08)!important;font-size:10px!important;padding:3px 2px!important}
+#bui .ti img{max-width:44px!important;max-height:30px!important}#bui .ti b{font-size:10px!important;max-width:60px!important}#bui .ti span{font-size:10.5px!important}#bui .ti.on{box-shadow:0 0 0 2px #ffd23a!important}
+#bui .tdisc{flex:none;align-self:center;writing-mode:vertical-rl;transform:rotate(180deg);color:#5ad06a;font-size:12px}
+#bui #bDemol{font-size:12.5px!important;padding:5px 10px!important;border-radius:8px}
+body:has(#bui.on) #hud,body:has(#bui.on) #b5btn,body:has(#bui.on) #quest{display:none!important}
+#b5btn{border-radius:12px!important;font-size:14px!important;padding:6px 12px!important}`;document.head.appendChild(st)})();
+
+// ===================== V5.2: Bauen sauber getrennt – Wohnhaus vs. Gewerbe =====================
+// Wohnhäuser: Bauen-Knopf (Wände, Böden, Garten, Möbel). Geschäfte: Einrichtung über „Verwalten“ wie früher.
+const _myLot5g=myLotHere;myLotHere=function(){const l=_myLot5g();return l&&l.kind==='res'?l:null};
+buildCats=function(l){const o=own(l);const mine=o&&o.own==='buy';
+ if(l.kind==='res'){const c=[];if(mine)c.push(['bau5',tt('Wände & Böden','Walls & floors')],['garden5',tt('Garten','Garden')]);for(const k in HCAT)c.push([k,T(HCAT[k])]);c.push(['style',tt('Tapete & Boden','Wallpaper & floor')]);if(mine)c.push(['drug',tt('Labor','Lab')]);return c}
+ return[['need',tt('Geräte','Equipment')],['shop5',tt('Laden-Ausstattung','Shop fittings')],['deco',tt('Deko','Decor')],['wall',tt('Wand','Wall')],['style',tt('Boden & Wand','Floor & wall')]]};
+const _catItems5g=catItems;catItems=function(l,cat){if(l.kind==='res'&&cat==='shop5')return[];return _catItems5g(l,cat)};
+const _startBuild5g=startBuild;startBuild=function(l){_startBuild5g(l);if(BUILD){const cats=buildCats(l).map(c=>c[0]);if(!cats.includes(BUILD.cat)){BUILD.cat=cats.includes('liv')?'liv':cats[0];buildUI()}}};
+// Abreißen nur bei Wohnhäusern
+const _buildUI5g=buildUI;buildUI=function(){_buildUI5g();const b=$('bDemol');if(b&&BUILD&&LOTS[BUILD.lot].kind!=='res')b.style.display='none';const t=$('bTitle');if(t&&BUILD){const l=LOTS[BUILD.lot];t.textContent=(l.kind==='res'?tt('Bauen: ','Build: '):tt('Einrichten: ','Furnish: '))+lotName(l)}};
+// Leeres Grundstück: zuerst Gewerbe oder Wohnhaus wählen
+const BK5={};
+const _buildModal5g=buildModal;buildModal=function(l){const o=own(l);if(o&&!o.build&&o.own==='buy'&&!BK5[l.id]){MOD_L=l.id;openM(()=>showM(hd(tt('Was soll hier entstehen?','What should go here?'),'crane','#e8c83a')+`<div class="pn">${lotInfo(l)}</div>
+ <div class="bk5"><button data-a="bk5" data-v="${l.id}:res"><img src="${emojiIcon('🏡')}"><b>${tt('Wohnhaus','Residential')}</b><span>${tt('Zum Selbst-Wohnen oder Vermieten. Räume, Möbel, Garten frei gestalten.','Live in it or rent it out. Design rooms, furniture and garden.')}</span></button>
+ <button data-a="bk5" data-v="${l.id}:com"><img src="${emojiIcon('🏪')}"><b>${tt('Gewerbe','Commercial')}</b><span>${tt('Laden, Restaurant, Büro … Einrichtung & Personal über „Verwalten“.','Shop, restaurant, office … furnish & staff via “Manage”.')}</span></button></div>`),true);return}
+ _buildModal5g(l)};
+const _showM5g=showM;showM=function(h,live){if(MOD_L!=null&&BK5[MOD_L]&&h.indexOf('data-a="dobuild"')>=0){const k=BK5[MOD_L];const a=h.indexOf('<h3>'+tt('Geschäftshaus','Commercial building')),b=h.indexOf('<h3>'+tt('Privathaus','Private house'));
+  if(a>=0&&b>a){h=k==='res'?h.slice(0,a)+h.slice(b):h.slice(0,b)}h+=`<div class="btns"><button class="btn gray" data-a="bk5" data-v="${MOD_L}:">‹ ${tt('Andere Nutzung wählen','Choose other use')}</button></div>`}
+ return _showM5g(h,live)};
+L5A.bk5=v=>{const[i,k]=v.split(':');if(k)BK5[+i]=k;else delete BK5[+i];buildModal(LOTS[+i])};
+// Wohnhaus: Vermieten immer möglich (auch selbst gebaute / abgerissene Häuser) + Hinweis
+const _resModal5g=resModal;resModal=function(l){_resModal5g(l)};
+(function(){const st=document.createElement('style');st.textContent=`
+#sheet [data-a=build]{display:revert!important}
+.bk5{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.bk5 button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;background:#1e1a16;border:2px solid #000;box-shadow:inset 0 0 0 2px #4a4238;color:#e8e2d6;font:inherit;text-align:center;border-radius:10px}
+.bk5 button:active{transform:scale(.97)}.bk5 img{width:48px;height:48px;image-rendering:pixelated}.bk5 b{font-size:17px;color:#ffd23a}.bk5 span{font-size:12.5px;color:#b8ae9c;line-height:1.3}`;document.head.appendChild(st)})();
 
 // ===================== Start, Hauptmenü & Hauptschleife =====================
 function spawnPoint(){const h=ownedLots().find(l=>own(l).home);if(h&&h.iw&&h.ih)return[(h.ix+Math.floor(h.iw/2)+.5)*TS,(h.iy+h.ih-1.2)*TS];const l=h||LOTS.find(x=>x.spec==='jobs');return[(l.out.x+.5)*TS,(l.out.y+.8)*TS]}
